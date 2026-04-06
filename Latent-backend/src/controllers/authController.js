@@ -7,10 +7,6 @@ export const signup = async (req, res) => {
   try {
     const { username, email, first_name, last_name, password } = req.body;
 
-    if (!username || !email || !first_name || !last_name || !password) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
-
     // Check if user already exists
     const userCheck = await pool.query(
       'SELECT * FROM users WHERE username = $1 OR email = $2',
