@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import pool from './utils/db.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import vibeRoutes from './routes/vibeRoutes.js';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(cookieParser());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/vibes', vibeRoutes);
 
 // A test route to check the database connection
 app.get('/api/test-db', async (req, res) => {
