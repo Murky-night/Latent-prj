@@ -1,6 +1,7 @@
 import pool from '../utils/db.js';
 import bcrypt from 'bcrypt';
 import generateTokenAndSetCookie from '../utils/generateToken.js';
+import sendEmail from '../utils/sendEmail.js';
 
 // --- SIGNUP LOGIC ---
 export const signup = async (req, res) => {
@@ -30,6 +31,19 @@ export const signup = async (req, res) => {
 
     // Give them the JWT cookie immediately!
     generateTokenAndSetCookie(newUser.rows[0].id, res);
+
+    // SEND THE WELCOME EMAIL
+    try {
+      await sendEmail({
+        email: newUser.rows[0].email,
+        subject: 'Welcome to Latent, Gem Hunter!',
+        message: `Hi ${newUser.rows[0].username},\n\nWelcome to Latent! Your account has been successfully created. Get ready to discover the best-kept secrets in Hanoi.\n\nCheers,\nThe Latent Team`
+      });
+      console.log("Welcome email sent to Mailtrap!");
+    } catch (emailError) {
+      // Catch this so the user still registers even if the email fails
+      console.error('Failed to send welcome email:', emailError);
+    }
 
     res.status(201).json({
       message: 'Account created successfully',
