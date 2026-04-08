@@ -10,19 +10,21 @@ const router = express.Router();
 // Flow: Request -> Bouncer (JWT Check) -> Mailroom Clerk (Extracts File + Text) -> Read the policies -> Validate -> Controller
 router.put('/profile', protectRoute, upload.single('avatar'), updateProfileRules, validate, updateProfile);
 
-// ==========================================
 // UPDATE USER PREFERRED VIBES
-// PUT /api/users/:id/vibes
-// ==========================================
-router.put('/:id/vibes', async (req, res) => {
-    const { id } = req.params;
-    const { vibes } = req.body; 
+// PUT /api/users/vibes
+router.put('/vibes', protectRoute, async (req, res) => {
+    
+    // 1. Grab the ID securely from the decoded JWT token
+    const id = req.user.id; 
+    const { vibes } = req.body;
 
+    // 2. Validate the incoming array
     if (!Array.isArray(vibes) || vibes.length > 3) {
         return res.status(400).json({ error: 'You can only select up to 3 preferred vibes.' });
     }
 
     try {
+        // 3. Update the database using the secure token ID
         const updateUser = await pool.query(
             `UPDATE users 
              SET preferred_vibes = $1 
