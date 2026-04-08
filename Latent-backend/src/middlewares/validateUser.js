@@ -24,7 +24,14 @@ export const signupValidationRules = [
     
   body('last_name')
     .trim()
-    .notEmpty().withMessage('Last name is required')
+    .notEmpty().withMessage('Last name is required'),
+];
+
+export const updateProfileRules = [
+  body('phone')
+    .optional({ checkFalsy: true }) // Ignores null, undefined, and empty strings ""
+    .trim()
+    .isLength({ min: 10 }).withMessage('Invalid phone number')
 ];
 
 // 2. The Checker Function
