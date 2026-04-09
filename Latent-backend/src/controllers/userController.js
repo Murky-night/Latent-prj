@@ -129,3 +129,34 @@ export const changePassword = async (req, res) => {
     res.status(500).json({ error: 'Server error updating password' });
   }
 };
+
+export const getPublicProfile = async (req, res) => {
+  // 1. Grab the username from the URL (e.g., /api/users/cosmicdestroyer)
+  const { username } = req.params;
+
+  try {
+    // 2. The Safe Query: Explicitly request ONLY public columns.
+    // We leave out id, email, phone, password_hash, and reset tokens!
+    const userResult = await pool.query(
+      `SELECT username, first_name, last_name, avatar_url, bio, preferred_vibes, created_at 
+             FROM users 
+             WHERE username = $1`,
+      [username]
+    );
+
+    // 3. If the username doesn't exist in the database, return a 404
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // 4. Send the clean, safe profile data back to the frontend
+    res.status(200).json({
+      message: 'Profile fetched successfully',
+      user: userResult.rows[0]
+    });
+
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Server error fetching public profile' });
+  }
+};

@@ -1,9 +1,8 @@
 import express from 'express';
-import pool from '../utils/db.js';
-import { updateProfile , updateVibe , changePassword } from '../controllers/userController.js';
-import { protectRoute } from '../middlewares/protectRoute.js';
-import { updateProfileRules , updateVibeRules , changePasswordRules , validate } from '../middlewares/validateUser.js'; 
+import { changePassword, getPublicProfile, updateProfile, updateVibe } from '../controllers/userController.js';
 import { upload } from '../middlewares/multer.js';
+import { protectRoute } from '../middlewares/protectRoute.js';
+import { changePasswordRules, updateProfileRules, updateVibeRules, validate } from '../middlewares/validateUser.js';
 
 const router = express.Router();
 
@@ -17,5 +16,9 @@ router.put('/vibes', protectRoute, updateVibeRules, validate, updateVibe);
 // CHANGE USER PASSWORD
 // PUT /api/users/change-password
 router.put('/change-password', protectRoute, changePasswordRules, validate, changePassword);
+
+// GET PUBLIC USER PROFILE
+// GET /api/users/:username
+router.get('/:username', getPublicProfile);
 
 export default router;
