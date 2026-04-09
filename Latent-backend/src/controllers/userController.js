@@ -138,9 +138,7 @@ export const getPublicProfile = async (req, res) => {
     // 2. The Safe Query: Explicitly request ONLY public columns.
     // We leave out id, email, phone, password_hash, and reset tokens!
     const userResult = await pool.query(
-      `SELECT username, first_name, last_name, avatar_url, bio, preferred_vibes, created_at 
-             FROM users 
-             WHERE username = $1`,
+      `SELECT * FROM public_user_profiles WHERE username = $1`,
       [username]
     );
 

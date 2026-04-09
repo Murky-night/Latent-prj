@@ -47,3 +47,14 @@ CHECK (
     OR 
     array_length(preferred_vibes, 1) <= 3
 );
+
+CREATE OR REPLACE VIEW public_user_profiles AS
+SELECT 
+    username, 
+    first_name, 
+    last_name, 
+    avatar_url, 
+    bio, 
+    preferred_vibes, 
+    TO_CHAR(created_at, 'DD-MM-YYYY') AS created_at
+FROM users;
