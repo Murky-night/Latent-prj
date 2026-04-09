@@ -53,3 +53,37 @@ export const updateProfile = async (req, res) => {
     res.status(500).json({ message: 'Error updating profile.' });
   }
 };
+
+export const updatePreferredVibe = async (req , res) => {
+  // 1. Grab the ID securely from the decoded JWT token
+  const id = req.user.id; 
+  const { vibes } = req.body;
+
+  // 2. Validate the incoming array
+  if (!Array.isArray(vibes) || vibes.length > 3) {
+    return res.status(400).json({ error: 'You can only select up to 3 preferred vibes.' });
+  }
+
+  try {
+    // 3. Update the database using the secure token ID
+    const updateUser = await pool.query(
+      `UPDATE users 
+       SET preferred_vibes = $1 
+       WHERE id = $2 
+       RETURNING id, username, preferred_vibes`,
+      [vibes, id]
+    );
+
+    if (updateUser.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json({
+    message: 'Vibes updated successfully',
+    user: updateUser.rows[0]
+    });
+  } catch (err) {
+      console.error(err.message);
+      res.status(500).json({ error: 'Server error updating user vibes' });
+  }
+}
