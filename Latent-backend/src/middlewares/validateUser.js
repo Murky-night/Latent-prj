@@ -60,6 +60,14 @@ export const updateVibeRules = [
     })
 ];
 
+export const changePasswordRules = [
+    body('currentPassword')
+        .notEmpty().withMessage('You must provide your current password.'),
+    
+    body('newPassword')
+        // .isLength({ min: 8 }).withMessage('New password must be at least 8 characters long.')
+];
+
 // 2. The Checker Function
 // This actually reads the report card from the rules above.
 export const validate = (req, res, next) => {
