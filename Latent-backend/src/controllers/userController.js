@@ -54,18 +54,13 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-export const updatePreferredVibe = async (req , res) => {
-  // 1. Grab the ID securely from the decoded JWT token
+export const updateVibe = async (req , res) => {
+  // Grab the ID securely from the decoded JWT token
   const id = req.user.id; 
   const { vibes } = req.body;
 
-  // 2. Validate the incoming array
-  if (!Array.isArray(vibes) || vibes.length > 3) {
-    return res.status(400).json({ error: 'You can only select up to 3 preferred vibes.' });
-  }
-
   try {
-    // 3. Update the database using the secure token ID
+    // Update the database using the secure token ID
     const updateUser = await pool.query(
       `UPDATE users 
        SET preferred_vibes = $1 
