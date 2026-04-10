@@ -1,8 +1,8 @@
-import pool from '../utils/db.js';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+import pool from '../utils/db.js';
 import generateTokenAndSetCookie from '../utils/generateToken.js';
 import sendEmail from '../utils/sendEmail.js';
-import crypto from 'crypto';
 
 // --- SIGNUP LOGIC ---
 export const signup = async (req, res) => {
@@ -23,37 +23,93 @@ export const signup = async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+    // GENERATE THE VERIFICATION TOKEN
+    // Creates a 64-character random hex string
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    // Sets expiration for exactly 24 hours from right now
+    const verificationExpires = Date.now() + 24 * 60 * 60 * 1000;
+
     // Insert user into database
     const newUser = await pool.query(
-      `INSERT INTO users (username, email, first_name, last_name, password_hash) 
-       VALUES ($1, $2, $3, $4, $5) RETURNING id, username, email, first_name, last_name`,
-      [username, email, first_name, last_name, hashedPassword]
+      `INSERT INTO users (username, email, first_name, last_name, password_hash, email_verify_token, email_verify_expires) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7) 
+       RETURNING id, username, email, first_name, last_name`,
+      [username, email, first_name, last_name, hashedPassword, verificationToken, verificationExpires]
     );
 
     // Give them the JWT cookie immediately!
     generateTokenAndSetCookie(newUser.rows[0].id, res);
 
-    // SEND THE WELCOME EMAIL
+    // SEND THE VERIFICATION EMAIL
     try {
+      const verifyUrl = `${process.env.CLIENT_URL}/verify-email/${verificationToken}`;
+
       await sendEmail({
         email: newUser.rows[0].email,
-        subject: 'Welcome to Latent, Gem Hunter!',
-        message: `Hi ${newUser.rows[0].username},\n\nWelcome to Latent! Your account has been successfully created. Get ready to discover the best-kept secrets in Hanoi.\n\nCheers,\nThe Latent Team`
+        subject: 'Action Required: Verify your Latent account',
+        message: `Hi ${newUser.rows[0].first_name},\n\nPlease click the link below to verify your email address. This link expires in 24 hours.\n\n${verifyUrl}\n\nThe Latent Team`
       });
-      console.log("Welcome email sent to Mailtrap!");
+      console.log("Verification email sent to Mailtrap!");
     } catch (emailError) {
       // Catch this so the user still registers even if the email fails
       console.error('Failed to send welcome email:', emailError);
     }
 
     res.status(201).json({
-      message: 'Account created successfully',
+      message: 'User created successfully! Please check your email to verify your account.',
       user: newUser.rows[0]
     });
 
   } catch (error) {
     console.error("Signup Error:", error);
     res.status(500).json({ message: 'Internal server error during signup' });
+  }
+};
+
+//--- VERIFY EMAIL LOGIC ---
+export const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    // 1. Find user with this token that hasn't expired
+    const userResult = await pool.query(
+      `SELECT * FROM users 
+       WHERE email_verify_token = $1 AND email_verify_expires > $2`,
+      [token, Date.now()]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(400).json({ message: 'Invalid or expired verification link.' });
+    }
+
+    const user = userResult.rows[0];
+
+    // 2. Flip the switch and clear the tokens!
+    await pool.query(
+      `UPDATE users 
+       SET is_email_verified = true,
+           email_verify_token = NULL,
+           email_verify_expires = NULL
+       WHERE id = $1`,
+      [user.id]
+    );
+
+    // 3. SEND THE OFFICIAL WELCOME EMAIL
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: 'Welcome to Latent, Gem Hunter!',
+        message: `Hi ${user.first_name},\n\nYour email has been successfully verified!\n\nWelcome to the Latent community. Get ready to discover the best-kept secrets in Hanoi.\n\nCheers,\nThe Latent Team`
+      });
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError);
+    }
+
+    res.status(200).json({ message: 'Email verified successfully! Welcome to Latent.' });
+
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Server error during verification' });
   }
 };
 
@@ -124,15 +180,15 @@ export const forgotPassword = async (req, res) => {
       // Security Best Practice: Don't tell hackers if an email exists or not
       return res.status(200).json({ message: 'If an account with that email exists, a reset link has been sent.' });
     }
-        
+
     const user = userResult.rows[0];
 
     // 2. Generate a random reset token
     const resetToken = crypto.randomBytes(32).toString('hex');
-        
+
     // 3. Hash the token for database storage (just like a password)
     const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-        
+
     // 4. Set expiration time (e.g., 15 minutes from now)
     const expiresIn = Date.now() + 15 * 60 * 1000;
 
@@ -156,27 +212,27 @@ export const forgotPassword = async (req, res) => {
       res.status(200).json({ message: 'Reset link sent to email!' });
     } catch (emailErr) {
       // If email fails, wipe the token from DB so they can try again
-        await pool.query('UPDATE users SET reset_password_token = NULL, reset_password_expires = NULL WHERE email = $1', [email]);
-        return res.status(500).json({ error: 'There was an error sending the email. Try again later.' });
+      await pool.query('UPDATE users SET reset_password_token = NULL, reset_password_expires = NULL WHERE email = $1', [email]);
+      return res.status(500).json({ error: 'There was an error sending the email. Try again later.' });
     }
 
   } catch (err) {
-      console.error(err.message);
-      res.status(500).json({ error: 'Server error during forgot password' });
+    console.error(err.message);
+    res.status(500).json({ error: 'Server error during forgot password' });
   }
 };
 
 // --- RESET PASSWORD ---
 export const resetPassword = async (req, res) => {
   // The token comes from the URL, the new password comes from the body
-  const { token } = req.params; 
+  const { token } = req.params;
   const { newPassword } = req.body;
 
   try {
 
     // Forcefully remove any accidental spaces or newlines the user pasted
     const cleanToken = token.trim();
-        
+
     // 1. Re-hash the CLEAN token the user sent so we can compare it to the database
     const hashedToken = crypto.createHash('sha256').update(cleanToken).digest('hex');
 
@@ -207,8 +263,8 @@ export const resetPassword = async (req, res) => {
     res.status(200).json({ message: 'Password has been successfully reset. You can now log in.' });
 
   } catch (err) {
-      console.error(err.message);
-      res.status(500).json({ error: 'Server error during password reset' });
+    console.error(err.message);
+    res.status(500).json({ error: 'Server error during password reset' });
   }
 };
 
