@@ -2,4 +2,23 @@ $kind: http-request
 name: Update profile
 url: "{{baseURL}}/users/profile"
 method: PUT
+body:
+  type: formdata
+  content:
+    - type: text
+      key: bio
+      value: addaaaaad
+      description: ""
+      disabled: true
+    - type: text
+      key: phone
+      value: "01564789231"
+      description: ""
+      disabled: true
+    - type: file
+      key: avatar
+      src:
+        - /D:/Ground Pound/A9 sticker/15fdb1afbaa10ec2d4f35dce7e116aed.png
+      description: ""
+      disabled: false
 order: 1906153507146669

@@ -1,0 +1,9 @@
+$kind: http-request
+name: Verify email
+url: "{{baseURL}}/auth/verify-email/769bbece2569e2de84f5d44ab848bf3abdc105f1f7c\
+  3e697dd407da67e3c4514"
+method: GET
+body:
+  type: json
+  content: ""
+order: 326
