@@ -4,36 +4,57 @@ import pool from '../utils/db.js';
 
 export const updateProfile = async (req, res) => {
   try {
-    const { bio, phone } = req.body;
+    const { bio, phone, first_name, last_name, username } = req.body;
     const userId = req.user.id;
 
     // We start by assuming no new photo was uploaded
     let newAvatarUrl = null;
+    let newAvatarId = null;
 
     // Convert the raw file in memory into a format Cloudinary can read (Base64 Data URI)
     if (req.file) {
+
+      // 1. Fetch the user's CURRENT avatar_id from the database
+      const userResult = await pool.query(
+        'SELECT avatar_id FROM users WHERE id = $1',
+        [req.user.id]
+      );
+
+      const oldAvatarId = userResult.rows[0]?.avatar_id;
+
+      // 2. If they have an old picture, log into Cloudinary and DESTROY it!
+      if (oldAvatarId) {
+        await cloudinary.uploader.destroy(oldAvatarId);
+      }
+
+      // 3. Convert the raw file in memory into a format Cloudinary can read
       const b64 = Buffer.from(req.file.buffer).toString('base64');
       const dataURI = "data:" + req.file.mimetype + ";base64," + b64;
 
-      // Send the image to Cloudinary!
+      // 4. Send the image to Cloudinary!
       const cloudinaryResponse = await cloudinary.uploader.upload(dataURI, {
         folder: 'latent_avatars', // Puts all avatars in a neat folder in your Cloudinary account
       });
 
       newAvatarUrl = cloudinaryResponse.secure_url;
+      newAvatarId = cloudinaryResponse.public_id;
     }
 
     // Update the database using COALESCE
     // COALESCE means: "If the new value is NULL, keep whatever is currently in the database."
     const updatedUser = await pool.query(
       `UPDATE users 
-       SET bio = COALESCE($1, bio), 
-           phone = COALESCE($2, phone), 
-           avatar_url = COALESCE($3, avatar_url),
-           updated_at = CURRENT_TIMESTAMP 
-       WHERE id = $4 
+       SET bio = COALESCE($1, bio),
+           phone = COALESCE($2, phone),
+           first_name = COALESCE($3, first_name),
+           last_name = COALESCE($4, last_name),
+           username = COALESCE($5, username),
+           avatar_url = COALESCE($6, avatar_url),
+           avatar_id = COALESCE($7, avatar_id),
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id = $8
        RETURNING id, username, email, first_name, last_name, bio, phone, avatar_url`,
-      [bio, phone, newAvatarUrl, userId] // These map exactly to $1, $2, $3, $4
+      [bio, phone, first_name, last_name, username, newAvatarUrl, newAvatarId, userId] // These map exactly to $1, $2,..., $8
     );
 
     if (updatedUser.rows.length === 0) {
