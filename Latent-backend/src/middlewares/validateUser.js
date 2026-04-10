@@ -32,7 +32,8 @@ export const updateProfileRules = [
   body('phone')
     .optional({ checkFalsy: true }) // Ignores null, undefined, and empty strings ""
     .trim()
-    .isLength({ min: 10 }).withMessage('Invalid phone number')
+    .isNumeric().withMessage('Phone number can only contain numbers')
+    .isLength({min: 10, max: 10}).withMessage('Phone number must be exactly 10 digits')
 ];
 
 export const updateVibeRules = [
