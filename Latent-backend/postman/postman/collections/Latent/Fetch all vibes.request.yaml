@@ -1,0 +1,5 @@
+$kind: http-request
+name: Fetch all vibes
+url: "{{baseURL}}/vibes"
+method: GET
+order: 1039195077670108

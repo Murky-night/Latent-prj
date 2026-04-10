@@ -1,0 +1,12 @@
+$kind: http-request
+name: Update preferred vibes
+url: "{{baseURL}}/users/vibes"
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \    \"vibes\": [\"cozy\", \"hidden\"]\r
+
+    }"
+order: 1928913123351221

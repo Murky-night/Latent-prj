@@ -1,0 +1,5 @@
+$kind: http-request
+name: View public profile
+url: "{{baseURL}}/users/postman_fanatic"
+method: GET
+order: 790430598997144

@@ -1,0 +1,14 @@
+$kind: http-request
+name: Login
+url: "{{baseURL}}/auth/login"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"username\": \"postman_fanatic\",\r
+
+    \    \"password\": \"1\"\r
+
+    }"
+order: 760

@@ -1,0 +1,5 @@
+$kind: http-request
+name: Update profile
+url: "{{baseURL}}/users/profile"
+method: PUT
+order: 1906153507146669

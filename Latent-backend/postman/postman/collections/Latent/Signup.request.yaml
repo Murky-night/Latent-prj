@@ -1,0 +1,20 @@
+$kind: http-request
+name: Signup
+url: "{{baseURL}}/auth/signup"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"username\": \"postman_fanatic\",\r
+
+    \    \"email\": \"hello6@latent.com\",\r
+
+    \    \"first_name\": \"Post\",\r
+
+    \    \"last_name\": \"Man\",\r
+
+    \    \"password\": \"1\"\r
+
+    }"
+order: 170

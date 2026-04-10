@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseURL}}/auth/logout"
+method: POST
+order: 4503242040570723
