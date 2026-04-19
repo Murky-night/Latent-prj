@@ -1,0 +1,5 @@
+$kind: http-request
+name: Get location
+url: ""
+method: GET
+order: 3495705357671487

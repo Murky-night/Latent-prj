@@ -2,4 +2,4 @@ $kind: http-request
 name: Security check
 url: "{{baseURL}}/auth/me"
 method: GET
-order: 964
+order: 4006330817014108
