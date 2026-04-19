@@ -13,6 +13,23 @@ CREATE TABLE users (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE locations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    latitude NUMERIC(10, 7) NOT NULL,
+    longtitude NUMERIC(10, 7) NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    status VARCHAR(20) DEFAULT 'pending',
+    report_count INT DEFAULT 0,
+    user_id UUID REFERENCES users(id),
+    image_url VARCHAR(500),
+    image_id VARCHAR(255),
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE prefered_vibe (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) UNIQUE NOT NULL,      -- e.g., "Coffee Threads"
@@ -34,6 +51,29 @@ INSERT INTO prefered_vibe (name, slug) VALUES
 ('Open-air', 'open_air'),
 ('Pet-friendly', 'pet_friendly'),
 ('Cozy', 'cozy');
+
+INSERT INTO locations (name, description, address, lat, lng, category, status, user_id)
+VALUES 
+(
+    'The Whispering Bean', 
+    'A tiny cafe hidden on the 3rd floor of an old French villa. Great egg coffee, zero wifi. You have to walk through a tailor shop to find the stairs.', 
+    '14 Tống Duy Tân, Hoàn Kiếm, Hà Nội', 
+    21.0305880, 
+    105.8458920, 
+    'Cafe', 
+    'approved', -- Setting to 'approved' so we can test the map immediately
+    (SELECT id FROM users LIMIT 1) -- The magic trick to auto-assign a user
+),
+(
+    'Dusty Pages', 
+    'Second-hand bookstore tucked deep inside an old collective housing unit (Khu tập thể). Smells like old paper and nostalgia. Cash only.', 
+    'Ngõ 5 Dã Tượng, Trần Hưng Đạo, Hoàn Kiếm, Hà Nội', 
+    21.0232150, 
+    105.8455120, 
+    'Bookstore', 
+    'approved', 
+    (SELECT id FROM users LIMIT 1)
+);
 
 -- 2. Add the array column to the existing users table
 ALTER TABLE users 
@@ -58,3 +98,10 @@ SELECT
     preferred_vibes, 
     TO_CHAR(created_at, 'DD-MM-YYYY') AS created_at
 FROM users;
+
+ALTER TABLE users
+ADD COLUMN is_email_verified BOOLEAN DEFAULT FALSE,
+ADD COLUMN pending_email VARCHAR(255),
+ADD COLUMN email_verify_token VARCHAR(255),
+ADD COLUMN email_verify_expires BIGINT;
+
