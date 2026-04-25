@@ -13,11 +13,17 @@ export const locationRules = [
         .notEmpty().withMessage('Address is required so others can find it.'),
     body('latitude')
         .isFloat({ min: -90, max: 90 }).withMessage('Latitude must be a valid geographic coordinate.'),
-    body('longtitude')
+    body('longitude')
         .isFloat({ min: -180, max: 180 }).withMessage('Longitude must be a valid geographic coordinate.'),
     body('category')
         .trim()
-        .notEmpty().withMessage('Please assign a category (e.g., Cafe, Street Food).')
+        .notEmpty().withMessage('Please assign a category (e.g., Cafe, Street Food).'),
+    body('ideal_time')
+        .trim()
+        .notEmpty().withMessage('Please suggest the best time of day to experience this vibe.'),
+    body('vibes')
+        .trim()
+        .notEmpty().withMessage('Please provide at least one vibe, separated by commas.')
 ];
 
 export const validateLocation = (req, res, next) => {
@@ -32,4 +38,17 @@ export const validateLocation = (req, res, next) => {
     }
     
     next();
+};
+
+export const validateLocationUpdate = (req, res, next) => {
+    const errors = validationResult(req);
+    
+    // Notice we do NOT check for req.file here! 
+    // If they include one, great. If not, we keep the old one.
+
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    
+    next(); 
 };
