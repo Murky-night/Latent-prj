@@ -6,9 +6,9 @@ body:
   type: json
   content: "{\r
 
-    \    \"username\": \"jane_doe\",\r
+    \    \"username\": \"analog_hanoi\",\r
 
-    \    \"password\": \"123\"\r
+    \    \"password\": \"1\"\r
 
     }"
 order: 3643049355063329

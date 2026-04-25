@@ -1,7 +1,6 @@
 $kind: http-request
 name: Verify email
-url: "{{baseURL}}/auth/verify-email/769bbece2569e2de84f5d44ab848bf3abdc105f1f7c\
-  3e697dd407da67e3c4514"
+url: "{{baseURL}}/auth/verify-email/bd9a9c9673c57341ba16ef560e6692be3b2efb9ac946b7ad2864e12c5029858f"
 method: GET
 body:
   type: json

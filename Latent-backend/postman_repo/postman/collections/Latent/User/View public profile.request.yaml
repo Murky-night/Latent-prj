@@ -1,5 +1,5 @@
 $kind: http-request
 name: View public profile
-url: "{{baseURL}}/users/postman_fanatic"
+url: "{{baseURL}}/users/analog_hanoi"
 method: GET
 order: 4096931435186010

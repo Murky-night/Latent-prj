@@ -1,0 +1,53 @@
+$kind: http-request
+name: Upload location
+url: "{{baseURL}}/locations"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: name
+      value: The Darkroom Cafe
+      description: ""
+      disabled: false
+    - type: text
+      key: description
+      value: A cafe attached to a working film
+      description: ""
+      disabled: false
+    - type: text
+      key: address
+      value: Tầng 3, 42 Phố Yết Kiêu, Hoàn Kiếm, Hà Nội
+      description: ""
+      disabled: false
+    - type: text
+      key: latitude
+      value: "21.025800"
+      description: ""
+      disabled: false
+    - type: text
+      key: longitude
+      value: "105.843600"
+      description: ""
+      disabled: false
+    - type: text
+      key: category
+      value: Cafe
+      description: ""
+      disabled: false
+    - type: text
+      key: ideal_time
+      value: Early morning (8:00 AM) for the best sunlight
+      description: ""
+      disabled: false
+    - type: text
+      key: vibes
+      value: vintage, artistic
+      description: ""
+      disabled: false
+    - type: file
+      key: image
+      src: []
+      description: ""
+      disabled: false
+order: 2393315299525654

@@ -7,18 +7,18 @@ body:
   content:
     - type: text
       key: bio
-      value: addaaaaad
+      value: "Documenting the disappearing French architecture of Hanoi on 35mm film. "
       description: ""
-      disabled: true
+      disabled: false
     - type: text
       key: phone
-      value: "01564789231"
+      value: "0156478967"
       description: ""
-      disabled: true
+      disabled: false
     - type: file
       key: avatar
       src:
-        - /D:/Ground Pound/A9 sticker/15fdb1afbaa10ec2d4f35dce7e116aed.png
+        - /E:/57qMyFGX.jpg
       description: ""
       disabled: false
 order: 4400372123815507

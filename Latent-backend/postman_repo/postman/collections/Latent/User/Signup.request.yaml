@@ -6,9 +6,9 @@ body:
   type: json
   content: "{\r
 
-    \    \"username\": \"postman_fanatic\",\r
+    \    \"username\": \"analog_hanoi\",\r
 
-    \    \"email\": \"hello6@latent.com\",\r
+    \    \"email\": \"analog.hanoi@example.com\",\r
 
     \    \"first_name\": \"Post\",\r
 
