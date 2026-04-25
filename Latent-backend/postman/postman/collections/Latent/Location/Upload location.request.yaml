@@ -1,0 +1,54 @@
+$kind: http-request
+name: Upload location
+url: "{{baseURL}}/locations"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: name
+      value: The Alchemist's Attic
+      description: ""
+      disabled: false
+    - type: text
+      key: description
+      value: A hidden speakeasy specializing in botanical cocktails
+      description: ""
+      disabled: false
+    - type: text
+      key: address
+      value: Tầng 2, 65 Hàng Bún, Ba Đình, Hà Nội
+      description: ""
+      disabled: false
+    - type: text
+      key: latitude
+      value: "21.0425000"
+      description: ""
+      disabled: false
+    - type: text
+      key: longitude
+      value: "105.845000"
+      description: ""
+      disabled: false
+    - type: text
+      key: category
+      value: Cafe
+      description: ""
+      disabled: false
+    - type: text
+      key: ideal_time
+      value: Late night (11:00 PM) for the jazz quartet
+      description: ""
+      disabled: false
+    - type: text
+      key: vibes
+      value: cinematic, hidden, artistic
+      description: ""
+      disabled: false
+    - type: file
+      key: image
+      src:
+        - /D:/Ground Pound/A9 sticker/1b3448c4984f4da27c70779265aec475.png
+      description: ""
+      disabled: false
+order: 2393315299525654
