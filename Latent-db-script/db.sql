@@ -30,6 +30,40 @@ CREATE TABLE locations (
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE EXTENSION postgis;
+
+-- 1. Add the new algorithm constraints and the spatial point
+ALTER TABLE locations
+ADD COLUMN budget_tier INTEGER DEFAULT 1, 
+ADD COLUMN group_capacity INTEGER DEFAULT 2,
+ADD COLUMN geom GEOGRAPHY(Point, 4326);
+
+-- 2. Convert your existing Lat/Lng into PostGIS geometry
+UPDATE locations
+SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326);
+
+-- 3. Create the spatial index so the Timeline engine runs in milliseconds
+CREATE INDEX idx_locations_geom ON locations USING GIST (geom);
+
+-- 4. Create the main Posts table for the Location blog
+CREATE TABLE location_posts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    location_id UUID REFERENCES locations(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    image_url TEXT, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 5. Create the Comments table so users can reply to Posts
+CREATE TABLE post_comments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    post_id UUID REFERENCES location_posts(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    comment_text TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE prefered_vibe (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) UNIQUE NOT NULL,      -- e.g., "Coffee Threads"
