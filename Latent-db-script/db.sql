@@ -46,7 +46,7 @@ SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326);
 CREATE INDEX idx_locations_geom ON locations USING GIST (geom);
 
 -- 4. Create the main Posts table for the Location blog
-CREATE TABLE location_posts (
+CREATE TABLE location_blog (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     location_id UUID REFERENCES locations(id) ON DELETE CASCADE,
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
@@ -56,9 +56,9 @@ CREATE TABLE location_posts (
 );
 
 -- 5. Create the Comments table so users can reply to Posts
-CREATE TABLE post_comments (
+CREATE TABLE blog_comments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    post_id UUID REFERENCES location_posts(id) ON DELETE CASCADE,
+    blog_id UUID REFERENCES location_posts(id) ON DELETE CASCADE,
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     comment_text TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
