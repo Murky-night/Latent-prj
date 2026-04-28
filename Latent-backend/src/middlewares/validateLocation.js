@@ -23,32 +23,40 @@ export const locationRules = [
         .notEmpty().withMessage('Please suggest the best time of day to experience this vibe.'),
     body('vibes')
         .trim()
-        .notEmpty().withMessage('Please provide at least one vibe, separated by commas.')
+        .notEmpty().withMessage('Please provide at least one vibe, separated by commas.'),
+    body('budget_tier')
+        .optional()
+        .isInt({ min: 1, max: 5 })
+        .notEmpty().withMessage('Budget tier must be a number between 1 ($) and 5 ($$$$$)'),
+    body('group_capacity')
+        .optional()
+        .isInt({ min: 1 })
+        .notEmpty().withMessage('Group capacity must be at least 1'),
 ];
 
 export const validateLocation = (req, res, next) => {
-    
+
     if (!req.file) {
         return res.status(400).json({ message: 'A hero image is required for all hidden gems.' });
     }
-    
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    
+
     next();
 };
 
 export const validateLocationUpdate = (req, res, next) => {
     const errors = validationResult(req);
-    
+
     // Notice we do NOT check for req.file here! 
     // If they include one, great. If not, we keep the old one.
 
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    
-    next(); 
+
+    next();
 };

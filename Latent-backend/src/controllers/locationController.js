@@ -3,7 +3,10 @@ import pool from '../utils/db.js';
 
 export const createLocation = async (req, res) => {
     try {
-        const { name, description, address, latitude, longitude, category, ideal_time, vibes } = req.body;
+        const { name, description, address, latitude, longitude, category, ideal_time, vibes, budget_tier, group_capacity } = req.body;
+
+        const lat = parseFloat(latitude);
+        const lng = parseFloat(longitude);
 
         const vibesArray = vibes.split(',').map(vibe => vibe.trim());
 
@@ -21,10 +24,15 @@ export const createLocation = async (req, res) => {
         // Insert into the database (Default status is 'pending')
         const newLocation = await pool.query(
             `INSERT INTO locations 
-            (name, description, address, latitude, longitude, category, user_id, image_url, image_id, ideal_time, vibes)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            (name, description, address, latitude, longitude, category, user_id, image_url, image_id, ideal_time, vibes, budget_tier, group_capacity)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
             RETURNING *`,
-            [name, description, address, latitude, longitude, category, req.user.id, imageUrl, imageId, ideal_time, vibesArray]
+            [name, description, address, lat, lng, category, req.user.id, imageUrl, imageId, ideal_time, vibesArray, budget_tier || 1, group_capacity || 1]
+        );
+
+        await pool.query(
+            `UPDATE locations SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326) WHERE id = $1`,
+            [newLocation.rows[0].id]
         );
 
         res.status(201).json({
@@ -117,8 +125,10 @@ export const updatePendingLocation = async (req, res) => {
         }
 
         // 3. Extract the new text data
-        const { name, description, address, latitude, longitude, category, ideal_time, vibes } = req.body;
-        const vibesArray = vibes.split(',').map(vibe => vibe.trim());
+        const { name, description, address, latitude, longitude, category, ideal_time, vibes, budget_tier, group_capacity } = req.body;
+        const vibesArray = vibes ? vibes.split(',').map(vibe => vibe.trim()) : [];
+        const lat = latitude ? parseFloat(latitude) : existingLocation.latitude;
+        const lng = longitude ? parseFloat(longitude) : existingLocation.longitude;
 
         // 4. Handle Optional Image Upload
         let newImageUrl = existingLocation.image_url;
@@ -138,11 +148,18 @@ export const updatePendingLocation = async (req, res) => {
         const updatedLocation = await pool.query(
             `UPDATE locations 
              SET name = $1, description = $2, address = $3, latitude = $4, longitude = $5, 
-                 category = $6, ideal_time = $7, vibes = $8, image_url = $9, image_id = $10, 
+                 category = $6, ideal_time = $7, vibes = $8, image_url = $9, image_id = $10,
+                 budget_tier = $11, group_capacity = $12,
                  updated_at = CURRENT_TIMESTAMP
-             WHERE id = $11
+             WHERE id = $13
              RETURNING *`,
-            [name, description, address, latitude, longitude, category, ideal_time, vibesArray, newImageUrl, newImageId, id]
+            [name, description, address, lat, lng, category, ideal_time, vibesArray, 
+             newImageUrl, newImageId, budget_tier, group_capacity, id]
+        );
+
+        await pool.query(
+            `UPDATE locations SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326) WHERE id = $1`,
+            [updatedLocation.rows[0].id]
         );
 
         res.status(200).json({
