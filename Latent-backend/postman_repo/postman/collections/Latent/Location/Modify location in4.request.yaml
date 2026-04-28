@@ -1,33 +1,33 @@
 $kind: http-request
 name: Modify location in4
-url: "{{baseURL}}/locations/89f4fab5-fb63-4baf-a037-e7a12e7182db"
+url: "{{baseURL}}/locations/be5ad811-d034-4f52-93de-7601663602b7"
 method: PUT
 body:
   type: formdata
   content:
     - type: text
       key: name
-      value: Darkroom
+      value: The Secret Garden Roastery
       description: ""
       disabled: false
     - type: text
       key: description
-      value: attached
+      value: A hidden oasis behind an old bookstore
       description: ""
       disabled: false
     - type: text
       key: address
-      value: Kiêu
+      value: 45B Ly Quoc Su, Hoan Kiem, Hanoi
       description: ""
       disabled: false
     - type: text
       key: latitude
-      value: "21.025800"
+      value: "21.03143"
       description: ""
       disabled: false
     - type: text
       key: longitude
-      value: "105.843600"
+      value: "105.85022"
       description: ""
       disabled: false
     - type: text
@@ -37,12 +37,22 @@ body:
       disabled: false
     - type: text
       key: ideal_time
-      value: Early
+      value: 08:00 AM - 11:00 AM
       description: ""
       disabled: false
     - type: text
       key: vibes
-      value: vintage
+      value: vintage, artistic
+      description: ""
+      disabled: false
+    - type: text
+      key: budget_tier
+      value: "2"
+      description: ""
+      disabled: false
+    - type: text
+      key: group_capacity
+      value: "4"
       description: ""
       disabled: false
 order: 4022095301028227

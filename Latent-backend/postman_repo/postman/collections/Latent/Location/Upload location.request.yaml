@@ -7,27 +7,27 @@ body:
   content:
     - type: text
       key: name
-      value: The Darkroom Cafe
+      value: The Secret Garden Roastery
       description: ""
       disabled: false
     - type: text
       key: description
-      value: A cafe attached to a working film
+      value: A hidden oasis behind an old bookstore
       description: ""
       disabled: false
     - type: text
       key: address
-      value: Tầng 3, 42 Phố Yết Kiêu, Hoàn Kiếm, Hà Nội
+      value: 45B Ly Quoc Su, Hoan Kiem, Hanoi
       description: ""
       disabled: false
     - type: text
       key: latitude
-      value: "21.025800"
+      value: "21.0315"
       description: ""
       disabled: false
     - type: text
       key: longitude
-      value: "105.843600"
+      value: "105.8502"
       description: ""
       disabled: false
     - type: text
@@ -37,7 +37,7 @@ body:
       disabled: false
     - type: text
       key: ideal_time
-      value: Early morning (8:00 AM) for the best sunlight
+      value: 08:00 AM - 11:00 AM
       description: ""
       disabled: false
     - type: text
@@ -45,9 +45,20 @@ body:
       value: vintage, artistic
       description: ""
       disabled: false
+    - type: text
+      key: budget_tier
+      value: "2"
+      description: ""
+      disabled: false
+    - type: text
+      key: group_capacity
+      value: "4"
+      description: ""
+      disabled: false
     - type: file
       key: image
-      src: []
+      src:
+        - /E:/Ground Pound/A9 sticker/8b257314cd85cffaadfe5b224fa7f9ad.png
       description: ""
       disabled: false
 order: 2393315299525654
